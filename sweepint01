@@ -1,0 +1,244 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/python  
+import sys  
+import random  
+import numpy
+import pygame
+import pygame.locals
+background_image_filename = 'b.jpg'
+mouse_image_filename = 'b (2).jpg'
+
+class MineSweeping():  
+    #扫雷主程序  
+    def __init__(self,row=8,line=8,mineNum = 15):  
+        self.row = row  
+        self.line = line
+        self.score = 0 #分数  
+        self.mineNum = mineNum
+        self.xy_list = [[0 for i in range(self.line)] for i in range(self.row)]
+        self.xy_num = [[0 for i in range(self.line)] for i in range(self.row)]
+    def initData(self):
+        # 初始化状态值
+        # 游戏开始的时候状态值为清零(再重新设置状态值)
+        self.xy_list = [[0 for i in range(self.line)] for i in range(self.row)]
+        # 设置雷的数量  
+        self.xy_num = [[0 for i in range(self.line)] for i in range(self.row)]
+        maxMine = self.mineNum  
+        while maxMine > 0 :
+            num_x = random.randint(0,self.row-1)  
+            num_y = random.randint(0,self.line-1)  
+            if self.xy_list[num_x][num_y] == 0:  
+                self.xy_list[num_x][num_y] = 1
+                self.xy_num[num_x][num_y]=self.xy_num[num_x][num_y]+1
+                if num_y>0 :
+                    self.xy_num[num_x][num_y-1]=self.xy_num[num_x][num_y-1]+1
+                if num_x>0:
+                    self.xy_num[num_x-1][num_y]=self.xy_num[num_x-1][num_y]+1
+                if num_x>0 and num_y>0:
+                    self.xy_num[num_x-1][num_y-1]=self.xy_num[num_x-1][num_y-1]+1
+                if num_x>0 and num_y<7:
+                    self.xy_num[num_x-1][num_y+1]=self.xy_num[num_x-1][num_y+1]+1
+                if num_x<7 and num_y>0:
+                    self.xy_num[num_x+1][num_y-1]=self.xy_num[num_x+1][num_y-1]+1
+                if num_x<7:
+                    self.xy_num[num_x+1][num_y]=self.xy_num[num_x+1][num_y]+1
+                if num_x<7 and num_y<7:
+                    self.xy_num[num_x+1][num_y+1]=self.xy_num[num_x+1][num_y+1]+1
+                if num_y<7:
+                    self.xy_num[num_x][num_y+1]=self.xy_num[num_x][num_y+1]+1
+                maxMine -= 1
+  
+    def  mine_clear(self,x,y):  
+        # 设置显示进行扫过的数目  
+        # 设置数字  
+        # 0 表示未扫过的安全位置
+        # 1 表示雷
+        # 2 表示扫过的位置 
+        #获取坐标的数字  
+        pos = self.xy_list[x][y]  
+        if pos == 0 :  
+            self.xy_list[x][y] = 2 
+            if y>0 and self.xy_list[x][y-1]!=1:
+                self.xy_list[x][y-1]=3
+            if x>0 and self.xy_list[x-1][y]!=1:
+                self.xy_list[x-1][y]=3
+            if x<7 and y<7 and self.xy_list[x+1][y+1]!=1:
+                self.xy_list[x+1][y+1]=3
+            return 0  
+        elif pos == 2 :
+            return 2  
+        elif pos == 3 :
+            return 2  
+        else:  
+            return 1  
+    def mineFace(self,state,x,y):  
+        #显示界面的内容  
+        #设置游戏的状态  
+        #1 表示运行的状态  
+        #2 表示输出的状态  
+        #3 表示游戏结束的状态  
+        #4 表示游戏获得了完胜  
+        if state == 1:
+            font1 = pygame.font.SysFont('simsun',48)
+            screen.blit(font1.render('Score:',True,(255,127,0)),(20,25))     #font.render第一个参数是文本内容，第二个参数是否抗锯齿，第三个参数字体颜色
+            while x:
+                while y:
+                    rc = (175, 175, 175)
+                    rp = (100+50*x, 100+50*y)
+                    rs = (49, 49)
+                    pygame.draw.rect(screen, rc, pygame.Rect(rp, rs))
+                    y=y-1
+                x=x-1
+                y=self.line
+            pygame.display.update()
+
+        if state == 2:
+            font1 = pygame.font.SysFont('simsun',48)
+            screen.blit(font1.render('Score:',True,(255,127,0)),(20,25))     #font.render第一个参数是文本内容，第二个参数是否抗锯齿，第三个参数字体颜色
+            screen.blit(font1.render('%s' % self.score,True,(255,127,0)),(170,25))
+            rc = (200, 200, 200)
+            rp = (100+50*x, 100+50*y)
+            rs = (49, 49)
+            pygame.draw.rect(screen, rc, pygame.Rect(rp, rs))
+            font3 = pygame.font.SysFont('simsun',48)
+            screen.blit(font3.render('%s' % self.xy_num[x][y],True,(255,127,0)),(115+50*x, 110+50*y))
+            if y>0 and self.xy_list[x][y-1]!=1:
+                rc = (200, 200, 200)
+                rp = (100+50*x, 100+50*(y-1))
+                rs = (49, 49)
+                pygame.draw.rect(screen, rc, pygame.Rect(rp, rs))
+                font3 = pygame.font.SysFont('simsun',48)
+                screen.blit(font3.render('%s' % self.xy_num[x][y-1],True,(255,127,0)),(115+50*x, 110+50*(y-1)))
+            if x>0 and self.xy_list[x-1][y]!=1:
+                rc = (200, 200, 200)
+                rp = (100+50*(x-1), 100+50*y)
+                rs = (49, 49)
+                pygame.draw.rect(screen, rc, pygame.Rect(rp, rs))
+                font3 = pygame.font.SysFont('simsun',48)
+                screen.blit(font3.render('%s' % self.xy_num[x-1][y],True,(255,127,0)),(115+50*(x-1), 110+50*y))
+            if x<7 and y<7 and self.xy_list[x+1][y+1]!=1:
+                rc = (200, 200, 200)
+                rp = (100+50*(x+1), 100+50*(y+1))
+                rs = (49, 49)
+                pygame.draw.rect(screen, rc, pygame.Rect(rp, rs))
+                font3 = pygame.font.SysFont('simsun',48)
+                screen.blit(font3.render('%s' % self.xy_num[x+1][y+1],True,(255,127,0)),(115+50*(x+1), 110+50*(y+1)))
+            pygame.display.update()
+
+
+    def MainLoop(self):  
+        #创建游戏主循环  
+        #创建界面的运行  
+        self.mineFace(1,self.line,self.row)  
+        self.score = 0
+        self.initData()  
+        #print self.xy_list  
+  
+        # 进入主循环  
+        while event.type == pygame.MOUSEBUTTONDOWN:
+            #获取坐标的位置
+            x, y = pygame.mouse.get_pos()
+            #获得鼠标位置
+            x = (int)((x-100)/50)
+            y = (int)((y-100)/50)
+            num = self.mine_clear(x,y) 
+            #判断是否过的了完胜  
+            win = True  
+            for i in self.xy_list:  
+                if 0 in i:  
+                    win = False  
+                    break  
+            if win:  
+                num = 4 
+            #执行刷新界面的函数  
+            if num == 0:  
+                self.score += 10  
+                self.mineFace(2,x,y)  
+            elif num == 1:
+                print ('+=================+')  
+                print ('     Game over    ' ) 
+                print ('+=================+')  
+                print ('分数 : ', self.score)  
+                self.mineFace(3,x,y)  
+                # 是不是进行下一局
+                next = input(u'是否进行下一局:Y or N ')  
+                if next.upper().startswith('Y'):  
+                    print ('下一局开始')  
+                    self.nextGame()  
+                else:  
+                    print ('>>> Game exit')  
+                    break  
+            else:  
+                self.score += 10
+                print("恭喜您获得的完全的胜利")
+                print("分数 :")
+                print(self.score)
+                self.mineFace(4,x,y)  
+                next = input(u'是否进行下一局:Y or N ')  
+                if next.upper().startswith('Y'):  
+                    print (u'下一局开始')  
+                    self.nextGame()  
+                else:  
+                    print ('>>> Game exit')  
+                    break  
+
+if __name__ == '__main__': 
+    pygame.init()
+    score=0
+    screen = pygame.display.set_mode((840, 600),0, 32)
+    SCREEN_SIZE = (840, 600)
+    screen = pygame.display.set_mode(SCREEN_SIZE,0, 32)
+    event_text = []
+    pygame.display.set_caption("扫雷")
+    background = pygame.image.load(background_image_filename).convert()
+    mouse_cursor = pygame.image.load(mouse_image_filename).convert_alpha()
+    font = pygame.font.SysFont("arial", 16);
+    font_height = font.get_linesize()
+    event = pygame.event.wait()
+    #将背景图画上去
+    pygame.display.update()
+    #pygame.mouse.set_visible(False)
+    #pygame.event.set_grab(True)
+    pygame.display.update()
+    running=1
+    while running:
+        #游戏主循环
+        event = pygame.event.wait()
+        event_text.append(str(event))
+        if pygame.key == pygame.K_f:
+            if pygame.Fullscreen:
+                screen = pygame.display.set_mode((640, 480), pygame.FULLSCREEN, 32)
+            else:
+                screen = pygame.display.set_mode((640, 480), 0, 32)
+        screen.blit(background, (0,0))
+        #将背景图画上去
+        my_font = pygame.font.SysFont("arial", 16)
+        font1 = pygame.font.SysFont('simsun',48)
+        font2 = pygame.font.SysFont(None,32)
+        screen.blit(font1.render('Score:',True,(255,127,0)),(20,25))     #font.render第一个参数是文本内容，第二个参数是否抗锯齿，第三个参数字体颜色
+        screen.blit(font2.render('Sweeping',True,(255,127,0)),(300,50))
+        x, y = pygame.mouse.get_pos()
+        #获得鼠标位置
+        x-= mouse_cursor.get_width() / 2
+        y-= mouse_cursor.get_height() / 2
+        #计算光标的左上角位置
+        screen.blit(mouse_cursor, (x, y))
+        #把光标画上去
+        pygame.display.update()
+        #刷新一下画面
+        #获得时间的名称
+        event_text = event_text[-SCREEN_SIZE[1]//font_height:]
+        #这个切片操作保证了event_text里面只保留一个屏幕的文字
+        y = SCREEN_SIZE[1]-font_height
+        #找一个合适的起笔位置，最下面开始但是要留一行的空
+        for text in reversed(event_text):
+            screen.blit( font.render(text, True, (0, 255, 0)), (0, y) )
+            y-=font_height
+        mi=MineSweeping(8,8,15)
+        mi.MainLoop()
+        if event.type == pygame.QUIT:
+            running=0
+            #把笔提一行
+        pygame.display.update()
+    pygame.quit()
+    sys.exit()
