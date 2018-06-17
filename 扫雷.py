@@ -7,7 +7,6 @@ import pygame.locals
 import tkinter
 
 background_image_filename = 'b.jpg'
-mouse_image_filename = 'b (2).jpg'
 mine_image_filename='a.jpg'
 win_image_filename='win.jpg'
 over_image_filename='over.jpg'
@@ -28,13 +27,16 @@ class Window(tkinter.Frame):
         # 创建一个按钮，调用tkinter下的Button类 
         w = tkinter.Label(self, text="CONTINUE OR NOT") 
         w.pack()  
-        quitButton2 = tkinter.Button(self, text="YES")  
+        quitButton2 = tkinter.Button(self, text="YES",command=self.client)  
         quitButton2.place(x=50,y=20)
         quitButton1 = tkinter.Button(self, text="NO",command=self.client_exit)  
         quitButton1.place(x=150,y=20)
     def client_exit(self):
         pygame.quit()
         exit()
+        self.master.destroy()  
+    def client(self):
+        self.master.destroy()
     
 class MineSweeping():  
     #扫雷主程序  
@@ -207,7 +209,7 @@ class MineSweeping():
                     root = tkinter.Tk()  
                     root.geometry("200x55")  
                     Window(root)  
-                    root.mainloop()       
+                    root.mainloop()
                     break
                 
                 if num==4:
@@ -219,11 +221,8 @@ class MineSweeping():
                     root = tkinter.Tk()  
                     root.geometry("200x55")  
                     Window(root)  
-                    root.mainloop()       
+                    root.mainloop()      
                     break
-
-def isover(x,y):
-    return 300<x<350 and 400<y<500
 
 if __name__ == '__main__': 
     pygame.init()
@@ -234,14 +233,12 @@ if __name__ == '__main__':
     event_text = []
     pygame.display.set_caption("扫雷")
     background = pygame.image.load(background_image_filename).convert()
-    mouse_cursor = pygame.image.load(mouse_image_filename).convert_alpha()
     font = pygame.font.SysFont("arial", 16);
     font_height = font.get_linesize()
     event = pygame.event.wait()
+    pygame.mixer.music.load('月光.mp3')
+    pygame.mixer.music.play()
     #将背景图画上去
-    pygame.display.update()
-    #pygame.mouse.set_visible(False)
-    #pygame.event.set_grab(True)
     pygame.display.update()
     while running:
         #游戏主循环
@@ -256,26 +253,10 @@ if __name__ == '__main__':
         screen.blit(font2.render('Sweeping',True,(255,127,0)),(300,50))
         x, y = pygame.mouse.get_pos()
         #获得鼠标位置
-        x-= mouse_cursor.get_width() / 2
-        y-= mouse_cursor.get_height() / 2
-        #计算光标的左上角位置
-        screen.blit(mouse_cursor, (x, y))
-        #把光标画上去
         pygame.display.update()
         #刷新一下画面
-        #获得时间的名称
-        event_text = event_text[-SCREEN_SIZE[1]//font_height:]
-        #这个切片操作保证了event_text里面只保留一个屏幕的文字
-        y = SCREEN_SIZE[1]-font_height
-        #找一个合适的起笔位置，最下面开始但是要留一行的空
         mi=MineSweeping(8,8,15)
         mi.MainLoop()
-#        event = pygame.event.wait()
-        event_text = event_text[-SCREEN_SIZE[1]//font_height:]
-        y = SCREEN_SIZE[1]-font_height
-        for text in reversed(event_text):
-            screen.blit( font.render(text, True, (0, 255, 0)), (0, y) )
-            y-=font_height
         if event.type == pygame.QUIT:
             running=0
         pygame.display.update()
