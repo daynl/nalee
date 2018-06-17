@@ -177,22 +177,14 @@ class MineSweeping():
                     screen.blit(font1.render('%s' % self.score,True,(255,127,0)),(170,25))
                     overer=pygame.image.load(over_image_filename).convert()
                     screen.blit(overer, (150, 100))
-
                     pygame.display.update()
                     # 是不是进行下一局
-                    next = input(u'是否进行下一局:Y or N ')
-                    if next.upper().startswith('Y'):
-                        print ('下一局开始')  
-                        self.nextGame()  
-                    else: 
-                        pygame.quit()
-                        sys.exit()  
-                        break  
+                    break
                 if num==4:
                     self.score += 10
                     self.mineFace(2,x,y)
                     winner=pygame.image.load(win_image_filename).convert()
-                    screen.blit(winner, (150, 00))
+                    screen.blit(winner, (150, 100))
                     pygame.display.update()
                     next = input(u'是否进行下一局:Y or N ')  
                     if next.upper().startswith('Y'):  
@@ -202,10 +194,13 @@ class MineSweeping():
                         print ('>>> Game exit')  
                         break  
 
-    def nextGame(self):
-        self.mineFace(1,self.line,self.row)
-        self.score=0
-        self.initData()
+#    def nextGame(self):
+#        self.mineFace(1,self.line,self.row)
+#        self.score=0
+#        self.initData()
+
+def isover(x,y):
+    return 300<x<350 and 400<y<500
 
 if __name__ == '__main__': 
     pygame.init()
@@ -229,11 +224,6 @@ if __name__ == '__main__':
         #游戏主循环
         event = pygame.event.wait()
         event_text.append(str(event))
-        if pygame.key == pygame.K_f:
-            if pygame.Fullscreen:
-                screen = pygame.display.set_mode((640, 480), pygame.FULLSCREEN, 32)
-            else:
-                screen = pygame.display.set_mode((640, 480), 0, 32)
         screen.blit(background, (0,0))
         #将背景图画上去
         my_font = pygame.font.SysFont("arial", 16)
@@ -255,14 +245,16 @@ if __name__ == '__main__':
         #这个切片操作保证了event_text里面只保留一个屏幕的文字
         y = SCREEN_SIZE[1]-font_height
         #找一个合适的起笔位置，最下面开始但是要留一行的空
+        mi=MineSweeping(8,8,15)
+        mi.MainLoop()
+#        event = pygame.event.wait()
+        event_text = event_text[-SCREEN_SIZE[1]//font_height:]
+        y = SCREEN_SIZE[1]-font_height
         for text in reversed(event_text):
             screen.blit( font.render(text, True, (0, 255, 0)), (0, y) )
             y-=font_height
-        mi=MineSweeping(8,8,15)
-        mi.MainLoop()
         if event.type == pygame.QUIT:
             running=0
-            #把笔提一行
         pygame.display.update()
     pygame.quit()
-    sys.exit()
+    sys.exit() 
