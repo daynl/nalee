@@ -4,6 +4,7 @@ import sys
 import random  
 import pygame
 import pygame.locals
+import tkinter
 
 background_image_filename = 'b.jpg'
 mouse_image_filename = 'b (2).jpg'
@@ -14,6 +15,27 @@ cover_image_filename='zero.png'
 
 running=1
 
+class Window(tkinter.Frame):    
+    def __init__(self, master= None):  
+        tkinter.Frame.__init__(self, master)  
+        self.master = master  
+        self.init_window()  
+  
+    def init_window(self):  
+        # 设置窗体的标题
+        self.master.title("")  
+        self.pack(fill=tkinter.BOTH, expand=1)  
+        # 创建一个按钮，调用tkinter下的Button类 
+        w = tkinter.Label(self, text="CONTINUE OR NOT") 
+        w.pack()  
+        quitButton2 = tkinter.Button(self, text="YES")  
+        quitButton2.place(x=50,y=20)
+        quitButton1 = tkinter.Button(self, text="NO",command=self.client_exit)  
+        quitButton1.place(x=150,y=20)
+    def client_exit(self):
+        pygame.quit()
+        exit()
+    
 class MineSweeping():  
     #扫雷主程序  
     def __init__(self,row=8,line=8,mineNum = 15):  
@@ -149,6 +171,9 @@ class MineSweeping():
         #print self.xy_list  
         while 1:       
             event = pygame.event.wait()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #获取坐标的位置
                 x, y = pygame.mouse.get_pos()
@@ -179,25 +204,23 @@ class MineSweeping():
                     screen.blit(overer, (150, 100))
                     pygame.display.update()
                     # 是不是进行下一局
+                    root = tkinter.Tk()  
+                    root.geometry("200x55")  
+                    Window(root)  
+                    root.mainloop()       
                     break
+                
                 if num==4:
                     self.score += 10
                     self.mineFace(2,x,y)
                     winner=pygame.image.load(win_image_filename).convert()
                     screen.blit(winner, (150, 100))
                     pygame.display.update()
-                    next = input(u'是否进行下一局:Y or N ')  
-                    if next.upper().startswith('Y'):  
-                        print (u'下一局开始')  
-                        self.MainLoop()
-                    else: 
-                        print ('>>> Game exit')  
-                        break  
-
-#    def nextGame(self):
-#        self.mineFace(1,self.line,self.row)
-#        self.score=0
-#        self.initData()
+                    root = tkinter.Tk()  
+                    root.geometry("200x55")  
+                    Window(root)  
+                    root.mainloop()       
+                    break
 
 def isover(x,y):
     return 300<x<350 and 400<y<500
