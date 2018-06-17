@@ -10,6 +10,8 @@ mouse_image_filename = 'b (2).jpg'
 mine_image_filename='a.jpg'
 win_image_filename='win.jpg'
 over_image_filename='over.jpg'
+cover_image_filename='zero.png'
+
 running=1
 
 class MineSweeping():  
@@ -82,9 +84,12 @@ class MineSweeping():
         #2 表示输出的状态  
         #3 表示游戏结束的状态  
         #4 表示游戏获得了完胜  
+        coverer=pygame.image.load(cover_image_filename).convert()
         if state == 1:
             font1 = pygame.font.SysFont('simsun',48)
-            screen.blit(font1.render('Score:',True,(255,127,0)),(20,25))     #font.render第一个参数是文本内容，第二个参数是否抗锯齿，第三个参数字体颜色
+            screen.blit(font1.render('Score:',True,(255,127,0)),(20,25))
+            screen.blit(coverer, (160, 25))
+            screen.blit(font1.render('%s' % self.score,True,(255,127,0)),(170,25))
             while x:
                 while y:
                     rc = (175, 175, 175)
@@ -99,6 +104,7 @@ class MineSweeping():
         if state == 2:
             font1 = pygame.font.SysFont('simsun',48)
             screen.blit(font1.render('Score:',True,(255,127,0)),(20,25))     #font.render第一个参数是文本内容，第二个参数是否抗锯齿，第三个参数字体颜色
+            screen.blit(coverer, (160, 25))
             screen.blit(font1.render('%s' % self.score,True,(255,127,0)),(170,25))
             rc = (200, 200, 200)
             rp = (100+50*x, 100+50*y)
@@ -136,6 +142,7 @@ class MineSweeping():
     def MainLoop(self):  
         #创建游戏主循环  
         #创建界面的运行  
+        coverer=pygame.image.load(cover_image_filename).convert()
         self.mineFace(1,self.line,self.row)  
         self.score = 0
         self.initData()  
@@ -166,6 +173,7 @@ class MineSweeping():
                     self.mineFace(1,self.line,self.row)
                 elif num == 1:
                     self.mineFace(3,x,y)
+                    screen.blit(coverer, (160, 25))
                     screen.blit(font1.render('%s' % self.score,True,(255,127,0)),(170,25))
                     overer=pygame.image.load(over_image_filename).convert()
                     screen.blit(overer, (150, 100))
