@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python  
-import sys  
+import sys
 import random  
 import pygame
 import pygame.locals
@@ -31,10 +31,12 @@ class Window(tkinter.Frame):
         quitButton2.place(x=50,y=20)
         quitButton1 = tkinter.Button(self, text="NO",command=self.client_exit)  
         quitButton1.place(x=150,y=20)
+        
     def client_exit(self):
         pygame.quit()
         exit()
         self.master.destroy()  
+        
     def client(self):
         self.master.destroy()
     
@@ -84,20 +86,19 @@ class MineSweeping():
         # 0 表示未扫过的安全位置
         # 1 表示雷
         # 2 表示扫过的位置 
+        #3
         #获取坐标的数字  
         pos = self.xy_list[x][y]  
         if pos == 0 :  
             self.xy_list[x][y] = 2 
             if y>0 and self.xy_list[x][y-1]!=1:
-                self.xy_list[x][y-1]=3
+                self.xy_list[x][y-1]=2
             if x>0 and self.xy_list[x-1][y]!=1:
-                self.xy_list[x-1][y]=3
+                self.xy_list[x-1][y]=2
             if x<7 and y<7 and self.xy_list[x+1][y+1]!=1:
-                self.xy_list[x+1][y+1]=3
+                self.xy_list[x+1][y+1]=2
             return 0  
         elif pos == 2 :
-            return 2  
-        elif pos == 3 :
             return 2  
         else:  
             return 1  
@@ -158,6 +159,7 @@ class MineSweeping():
                 font3 = pygame.font.SysFont('simsun',48)
                 screen.blit(font3.render('%s' % self.xy_num[x+1][y+1],True,(255,127,0)),(115+50*(x+1), 110+50*(y+1)))
             pygame.display.update()
+            
         if state == 3:
             miner=pygame.image.load(mine_image_filename).convert()
             screen.blit(miner, (100+50*x, 100+50*y))
@@ -171,7 +173,8 @@ class MineSweeping():
         self.score = 0
         self.initData()  
         #print self.xy_list  
-        while 1:       
+        while 1:  
+            num=-1
             event = pygame.event.wait()
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -182,7 +185,7 @@ class MineSweeping():
                 #获得鼠标位置
                 x = (int)((x-100)/50)
                 y = (int)((y-100)/50)
-                if x>-1 and y>-1:
+                if self.line>x>-1 and self.row>y>-1:
                     num = self.mine_clear(x,y)
                 #判断是否过的了完胜
                 win = True
@@ -196,14 +199,12 @@ class MineSweeping():
                 if num == 0 or num==2:
                     self.score += 10 
                     self.mineFace(2,x,y)
-                elif num==-1:
-                    self.mineFace(1,self.line,self.row)
                 elif num == 1:
                     self.mineFace(3,x,y)
                     screen.blit(coverer, (160, 25))
                     screen.blit(font1.render('%s' % self.score,True,(255,127,0)),(170,25))
                     overer=pygame.image.load(over_image_filename).convert()
-                    screen.blit(overer, (150, 100))
+                    screen.blit(overer, (100, 100))
                     pygame.display.update()
                     # 是不是进行下一局
                     root = tkinter.Tk()  
@@ -216,7 +217,7 @@ class MineSweeping():
                     self.score += 10
                     self.mineFace(2,x,y)
                     winner=pygame.image.load(win_image_filename).convert()
-                    screen.blit(winner, (150, 100))
+                    screen.blit(winner, (100, 100))
                     pygame.display.update()
                     root = tkinter.Tk()  
                     root.geometry("200x55")  
@@ -236,7 +237,7 @@ if __name__ == '__main__':
     font = pygame.font.SysFont("arial", 16);
     font_height = font.get_linesize()
     event = pygame.event.wait()
-    pygame.mixer.music.load('月光.mp3')
+    pygame.mixer.music.load('BOOMERANG.mp3')
     pygame.mixer.music.play()
     #将背景图画上去
     pygame.display.update()
@@ -255,6 +256,7 @@ if __name__ == '__main__':
         #获得鼠标位置
         pygame.display.update()
         #刷新一下画面
+        
         mi=MineSweeping(8,8,15)
         mi.MainLoop()
         if event.type == pygame.QUIT:
